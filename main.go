@@ -143,7 +143,7 @@ func main() {
 
 	fmt.Printf("%d torrents found\n", len(torrents))
 	for _, torrent := range torrents {
-		if torrent.IsFinished {
+		if torrent.Status == 0 || torrent.Status == 6 { // Finished or seeding
 			fmt.Println()
 			fmt.Printf("Torrent : %s\n", torrent.Name)
 			match, err := findMatch(torrent.Name)
