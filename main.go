@@ -8,7 +8,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/odwrtw/transmission"
+	"github.com/trishika/transmission-go"
 )
 
 const (
