@@ -7,16 +7,22 @@ import (
 	"os"
 	"path"
 	"strings"
-
-	"github.com/trishika/transmission-go"
 )
 
-const (
-	OUT = "."
-	URL = "127.0.0.1:9091"
-)
+import "github.com/jessevdk/go-flags"
+import "github.com/trishika/transmission-go"
+
+type Options struct {
+	Out string `short:"o" long:"out" description:"Output directory" default:"."`
+	Url string `short:"u" long:"url" description:"Transmission url" default:"127.0.0.1:9091"`
+}
+
+var options Options
+
+var parser = flags.NewParser(&options, flags.Default)
 
 var IGNORE = [...]string{"the", "and", "an", "a"}
+
 var EXTENSION = [...]string{".mp4", ".mkv", ".avi"}
 
 func contains(slice []string, search string) bool {
@@ -44,7 +50,7 @@ func splitter(s string, splits string) []string {
 func findMatch(torrent string) (string, error) {
 	torrentName := strings.ToLower(torrent)
 
-	files, err := ioutil.ReadDir(OUT)
+	files, err := ioutil.ReadDir(options.Out)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -94,7 +100,7 @@ func findMatch(torrent string) (string, error) {
 func moveFile(file string, to string) error {
 	if contains(EXTENSION[:], path.Ext(file)) {
 		fmt.Printf("Moving %s to %s\n", file, to)
-		return os.Rename(file, path.Join(OUT, to, path.Base(file)))
+		return os.Rename(file, path.Join(options.Out, to, path.Base(file)))
 	}
 	fmt.Printf("Skipping %s\n", file)
 	return nil
@@ -126,10 +132,18 @@ func move(torrentDir string, to string) error {
 }
 
 func main() {
+	if _, err := parser.Parse(); err != nil {
+		if flagsErr, ok := err.(*flags.Error); ok && flagsErr.Type == flags.ErrHelp {
+			os.Exit(0)
+		} else {
+			os.Exit(1)
+		}
+	}
+
 	fmt.Println("Filtering...")
 
 	conf := transmission.Config{
-		Address: fmt.Sprintf("http://%s/transmission/rpc", URL),
+		Address: fmt.Sprintf("http://%s/transmission/rpc", options.Url),
 	}
 	t, err := transmission.New(conf)
 	if err != nil {
