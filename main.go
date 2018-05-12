@@ -14,7 +14,7 @@ import "github.com/trishika/transmission-go"
 
 type Options struct {
 	Out string `short:"o" long:"out" description:"Output directory" default:"."`
-	Url string `short:"u" long:"url" description:"Transmission url" default:"127.0.0.1:9091"`
+	URL string `short:"u" long:"url" description:"Transmission url" default:"127.0.0.1:9091"`
 }
 
 var options Options
@@ -81,20 +81,20 @@ func findMatch(torrent string) (string, error) {
 		return "", fmt.Errorf("no match found for %s", torrent)
 	}
 
-	max_count := 0
-	max_name := ""
+	maxCount := 0
+	maxName := ""
 
 	for name, count := range match {
-		if count > max_count {
-			max_count = count
-			max_name = name
+		if count > maxCount {
+			maxCount = count
+			maxName = name
 		}
 	}
 
-	fmt.Printf("Found match %s", max_name)
+	fmt.Printf("Found match %s", maxName)
 	fmt.Println("")
 
-	return max_name, nil
+	return maxName, nil
 }
 
 func moveFile(file string, to string) error {
@@ -143,7 +143,7 @@ func main() {
 	fmt.Println("Filtering...")
 
 	conf := transmission.Config{
-		Address: fmt.Sprintf("http://%s/transmission/rpc", options.Url),
+		Address: fmt.Sprintf("http://%s/transmission/rpc", options.URL),
 	}
 	t, err := transmission.New(conf)
 	if err != nil {
