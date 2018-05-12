@@ -97,8 +97,7 @@ func findMatch(torrent string) (string, error) {
 		}
 	}
 
-	fmt.Printf("Found match %s", maxName)
-	fmt.Println("")
+	fmt.Printf("Found match %s\n", maxName)
 
 	return maxName, nil
 }
@@ -174,7 +173,7 @@ func main() {
 			torrentDir := path.Join(torrent.DownloadDir, torrent.Name)
 			err = move(torrentDir, match)
 			if err != nil {
-				fmt.Printf("Error moving file from torrent %s", torrent.Name)
+				fmt.Printf("Error moving file from torrent %s\n", torrent.Name)
 				continue
 			}
 			t.RemoveTorrents([]*transmission.Torrent{torrent}, true)
