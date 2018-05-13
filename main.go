@@ -28,8 +28,6 @@ var options Options
 
 var parser = flags.NewParser(&options, flags.Default)
 
-var IGNORE = [...]string{"the", "and", "an", "a"}
-
 var extensions []string
 
 func contains(slice []string, search string) bool {
@@ -69,13 +67,11 @@ func findMatch(torrent string) (string, error) {
 			s := splitter(strings.ToLower(f.Name()), ". ")
 			count := 0
 			for _, ss := range s {
-				if !contains(IGNORE[:], ss) {
-					if strings.Contains(torrentName, ss) {
-						count = count + 1
-					} else {
-						count = -1
-						break
-					}
+				if strings.Contains(torrentName, ss) {
+					count = count + 1
+				} else {
+					count = -1
+					break
 				}
 			}
 			if count > 0 {
