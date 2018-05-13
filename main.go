@@ -21,6 +21,7 @@ import "github.com/trishika/transmission-go"
 type Options struct {
 	Out string `short:"o" long:"out" description:"Output directory" default:"."`
 	URL string `short:"u" long:"url" description:"Transmission url" default:"127.0.0.1:9091"`
+	Ext string `short:"e" long:"extension" description:"File extension to filter" default:"mp4,mkv,avi"`
 }
 
 var options Options
@@ -29,7 +30,7 @@ var parser = flags.NewParser(&options, flags.Default)
 
 var IGNORE = [...]string{"the", "and", "an", "a"}
 
-var EXTENSION = [...]string{".mp4", ".mkv", ".avi"}
+var extensions []string
 
 func contains(slice []string, search string) bool {
 	for _, value := range slice {
@@ -103,7 +104,8 @@ func findMatch(torrent string) (string, error) {
 }
 
 func moveFile(file string, to string) error {
-	if contains(EXTENSION[:], path.Ext(file)) {
+	ext := strings.ToLower(path.Ext(file))
+	if len(ext) > 0 && contains(extensions[:], ext[1:]) {
 		fmt.Printf("Moving %s to %s\n", file, to)
 		return os.Rename(file, path.Join(options.Out, to, path.Base(file)))
 	}
@@ -144,6 +146,8 @@ func main() {
 			os.Exit(1)
 		}
 	}
+
+	extensions = strings.Split(options.Ext, ",")
 
 	fmt.Println("Filtering...")
 
