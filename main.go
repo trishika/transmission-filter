@@ -30,6 +30,7 @@ var parser = flags.NewParser(&options, flags.Default)
 
 var extensions []string
 
+// contains test if an array of string contains a string
 func contains(slice []string, search string) bool {
 	for _, value := range slice {
 		if value == search {
@@ -39,6 +40,7 @@ func contains(slice []string, search string) bool {
 	return false
 }
 
+// splitter split a string using multiple delimiter
 func splitter(s string, splits string) []string {
 	m := make(map[rune]int)
 	for _, r := range splits {
@@ -52,6 +54,11 @@ func splitter(s string, splits string) []string {
 	return strings.FieldsFunc(s, splitter)
 }
 
+// findMatch find the match for a torrent string name inside the directory
+// folder name.
+// The folder name substrings must all be present in the torrent name, except
+// substring inside brackets. If there is multiple match the one with more
+// substring will be selected.
 func findMatch(torrent string) (string, error) {
 	torrentName := strings.ToLower(torrent)
 
@@ -67,6 +74,7 @@ func findMatch(torrent string) (string, error) {
 			s := splitter(strings.ToLower(f.Name()), ". ")
 			count := 0
 			for _, ss := range s {
+				// All other substring need to be in the torrent name
 				if strings.Contains(torrentName, ss) {
 					count = count + 1
 				} else {
@@ -87,6 +95,7 @@ func findMatch(torrent string) (string, error) {
 	maxCount := 0
 	maxName := ""
 
+	// If there is multiple match select the longest name
 	for name, count := range match {
 		if count > maxCount {
 			maxCount = count
@@ -99,6 +108,7 @@ func findMatch(torrent string) (string, error) {
 	return maxName, nil
 }
 
+// moveFile move a file to the given directory
 func moveFile(file string, to string) error {
 	ext := strings.ToLower(path.Ext(file))
 	if len(ext) > 0 && contains(extensions[:], ext[1:]) {
@@ -109,6 +119,7 @@ func moveFile(file string, to string) error {
 	return nil
 }
 
+// move move all file from a torrent matching the filter to the given directory
 func move(torrentDir string, to string) error {
 	f, err := os.Stat(torrentDir)
 	if err != nil {
@@ -147,14 +158,18 @@ func main() {
 
 	fmt.Println("Filtering...")
 
+	// Create the transmission connection object
 	conf := transmission.Config{
 		Address: fmt.Sprintf("http://%s/transmission/rpc", options.URL),
 	}
+
+	// Connect to transmission
 	t, err := transmission.New(conf)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// Get all torrent
 	torrents, err := t.GetTorrents()
 	if err != err {
 		log.Fatal(err)
@@ -162,7 +177,8 @@ func main() {
 
 	fmt.Printf("%d torrents found\n", len(torrents))
 	for _, torrent := range torrents {
-		if torrent.Status == 0 || torrent.Status == 6 { // Finished or seeding
+		// Filter only finished or seeding torrent
+		if torrent.Status == 0 || torrent.Status == 6 {
 			fmt.Println()
 			fmt.Printf("Torrent : %s\n", torrent.Name)
 			match, err := findMatch(torrent.Name)
