@@ -13,6 +13,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"unicode/utf8"
 )
 
 import "github.com/jessevdk/go-flags"
@@ -74,6 +75,10 @@ func findMatch(torrent string) (string, error) {
 			s := splitter(strings.ToLower(f.Name()), ". ")
 			count := 0
 			for _, ss := range s {
+				// Skip what is inside brackets
+				if r, _ := utf8.DecodeRuneInString(ss); r == '(' {
+					continue
+				}
 				// All other substring need to be in the torrent name
 				if strings.Contains(torrentName, ss) {
 					count = count + 1
