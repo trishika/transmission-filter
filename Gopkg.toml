@@ -1,0 +1,11 @@
+[[constraint]]
+  name = "github.com/jessevdk/go-flags"
+  version = "1.4.0"
+
+[[constraint]]
+  name = "github.com/trishika/transmission-go"
+  branch = "master"
+
+[prune]
+  go-tests = true
+  unused-packages = true
