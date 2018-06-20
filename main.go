@@ -19,13 +19,13 @@ import (
 import "github.com/jessevdk/go-flags"
 import "github.com/trishika/transmission-go"
 
-type Options struct {
+type opt struct {
 	Out string `short:"o" long:"out" description:"Output directory" default:"."`
 	URL string `short:"u" long:"url" description:"Transmission url" default:"127.0.0.1:9091"`
 	Ext string `short:"e" long:"extension" description:"File extension to filter" default:"mp4,mkv,avi,srt,mp3,ogg"`
 }
 
-var options Options
+var options opt
 
 var parser = flags.NewParser(&options, flags.Default)
 
