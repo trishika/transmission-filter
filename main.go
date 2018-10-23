@@ -128,7 +128,7 @@ func moveFile(file string, to string) error {
 func move(torrentDir string, to string) error {
 	f, err := os.Stat(torrentDir)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	if f.Mode().IsDir() {
 		files, err := ioutil.ReadDir(torrentDir)
